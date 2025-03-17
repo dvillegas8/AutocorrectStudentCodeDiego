@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Autocorrect
@@ -12,20 +13,16 @@ import java.io.IOException;
  */
 public class Autocorrect {
 
+    private String[] words;
+    private int threshold;
     /**
      * Constucts an instance of the Autocorrect class.
      * @param words The dictionary of acceptable words.
      * @param threshold The maximum number of edits a suggestion can have.
      */
     public Autocorrect(String[] words, int threshold) {
-        int[][] table = new int[5][5];
-        // Add our base cases
-        for(int j = 0; j < table[0].length; j++){
-            table[0][j] = j;
-        }
-        for(int i = 0; i < table.length; i++){
-            table[i][0] = i;
-        }
+        this.words = words;
+        this.threshold = threshold;
     }
 
     /**
@@ -35,8 +32,27 @@ public class Autocorrect {
      * to threshold, sorted by edit distnace, then sorted alphabetically.
      */
     public String[] runTest(String typed) {
-        // Test
+        String wordOne = "";
+        ArrayList<String> goodWords = new ArrayList<String>();
+        for(int i = 0; i < words.length; i++){
+            wordOne = words[i];
+            int[][] table = new int[wordOne.length() + 1][typed.length() + 1];
+            int editDistance = lev(wordOne, typed, table);
+            if(editDistance <= threshold){
+                goodWords.add(wordOne);
+            }
+        }
+        int[][] table = new int[5][5];
+        // Add our base cases
+        for(int j = 0; j < table[0].length; j++){
+            table[0][j] = j;
+        }
+        for(int i = 0; i < table.length; i++){
+            table[i][0] = i;
+        }
+
         return new String[0];
+
     }
 
 
@@ -85,9 +101,8 @@ public class Autocorrect {
                     // Get the smallest and add one
                     minimum = Math.min(minOne, minTwo);
                     minimum = Math.min(minimum, minThree) + 1;
-                    table[i][j] = minimum;
                 }
-
+                table[i][j] = minimum;
             }
         }
         return table[wordOne.length()][wordTwo.length()];
