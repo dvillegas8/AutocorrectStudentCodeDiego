@@ -8,7 +8,7 @@ import java.io.IOException;
  * A command-line tool to suggest similar words when given one not in the dictionary.
  * </p>
  * @author Zach Blick
- * @author YOUR NAME HERE
+ * @author Diego Villegas
  */
 public class Autocorrect {
 
@@ -18,7 +18,14 @@ public class Autocorrect {
      * @param threshold The maximum number of edits a suggestion can have.
      */
     public Autocorrect(String[] words, int threshold) {
-
+        int[][] table = new int[5][5];
+        // Add our base cases
+        for(int j = 0; j < table[0].length; j++){
+            table[0][j] = j;
+        }
+        for(int i = 0; i < table.length; i++){
+            table[i][0] = i;
+        }
     }
 
     /**
@@ -57,5 +64,32 @@ public class Autocorrect {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    public int lev(String wordOne, String wordTwo, int[][] table){
+        int minimum = 0;
+        for(int i = 1; i < table.length; i++){
+            for(int j = 1; j < table[0].length; j++){
+                // If heads are the same, get tail a & tail b
+                if(wordOne.charAt(i - 1) == wordTwo.charAt(j - 1)){
+                    minimum = table[i - 1][j - 1];
+                    table[i][j] = minimum;
+                }
+                // Other cases since heads aren't the same
+                else{
+                    // Addition case/ tail a & b
+                    int minOne = table[i - 1][j];
+                    // Deletion case/ a & tail b
+                    int minTwo = table[i][j];
+                    // Substitution Case/ tail a & tail b
+                    int minThree = table[i - 1][j - 1];
+                    // Get the smallest and add one
+                    minimum = Math.min(minOne, minTwo);
+                    minimum = Math.min(minimum, minThree) + 1;
+                    table[i][j] = minimum;
+                }
+
+            }
+        }
+        return table[wordOne.length()][wordTwo.length()];
     }
 }
