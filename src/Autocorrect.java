@@ -37,21 +37,19 @@ public class Autocorrect {
         for(int i = 0; i < words.length; i++){
             wordOne = words[i];
             int[][] table = new int[wordOne.length() + 1][typed.length() + 1];
+            // Add our base cases
+            for(int j = 0; j < table[0].length; j++){
+                table[0][j] = j;
+            }
+            for(int k = 0; k < table.length; k++){
+                table[k][0] = k;
+            }
             int editDistance = lev(wordOne, typed, table);
             if(editDistance <= threshold){
                 goodWords.add(wordOne);
             }
         }
-        int[][] table = new int[5][5];
-        // Add our base cases
-        for(int j = 0; j < table[0].length; j++){
-            table[0][j] = j;
-        }
-        for(int i = 0; i < table.length; i++){
-            table[i][0] = i;
-        }
-
-        return new String[0];
+        return goodWords.toArray(new String[0]);
 
     }
 
@@ -95,14 +93,14 @@ public class Autocorrect {
                     // Addition case/ tail a & b
                     int minOne = table[i - 1][j];
                     // Deletion case/ a & tail b
-                    int minTwo = table[i][j];
+                    int minTwo = table[i][j - 1];
                     // Substitution Case/ tail a & tail b
                     int minThree = table[i - 1][j - 1];
                     // Get the smallest and add one
                     minimum = Math.min(minOne, minTwo);
-                    minimum = Math.min(minimum, minThree) + 1;
+                    minimum = Math.min(minimum, minThree);
+                    table[i][j] = minimum + 1;
                 }
-                table[i][j] = minimum;
             }
         }
         return table[wordOne.length()][wordTwo.length()];
