@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Autocorrect
@@ -32,7 +33,9 @@ public class Autocorrect {
      * to threshold, sorted by edit distnace, then sorted alphabetically.
      */
     public String[] runTest(String typed) {
+        String[] dictionary = words;
         String wordOne = "";
+        ArrayList<String>[] arrayOfArrayLists = new ArrayList[2];
         ArrayList<String> goodWords = new ArrayList<String>();
         for(int i = 0; i < words.length; i++){
             wordOne = words[i];
@@ -46,10 +49,33 @@ public class Autocorrect {
             }
             int editDistance = lev(wordOne, typed, table);
             if(editDistance <= threshold){
-                goodWords.add(wordOne);
+                arrayOfArrayLists[0].add(wordOne);
+                arrayOfArrayLists[1].add(Integer.toString(editDistance));
             }
         }
-        return goodWords.toArray(new String[0]);
+        ArrayList<String> goodWordsThree = new ArrayList<String>();
+        int min = Integer.parseInt(arrayOfArrayLists[1].get(0));
+        int minIndex = 0;
+        for(int i = 0; i < arrayOfArrayLists[1].size() - 1; i++){
+            for(int j = i + 1; j < arrayOfArrayLists[1].size(); j++){
+                if(min < Integer.parseInt(arrayOfArrayLists[1].get(j))){
+                    min = Integer.parseInt(arrayOfArrayLists[1].get(j));
+                    minIndex = j;
+                }
+                else if(min == Integer.parseInt(arrayOfArrayLists[1].get(j))){
+                    // If word at j comes before word at min index
+                    if(arrayOfArrayLists[1].get(j).compareTo(arrayOfArrayLists[1].get(minIndex)) < 0){
+                        min = Integer.parseInt(arrayOfArrayLists[1].get(j));
+                        minIndex = j;
+                    }
+
+                }
+            }
+            goodWordsThree.add(arrayOfArrayLists[1].get(minIndex));
+        }
+
+        String[] goodWordsArray = goodWords.toArray(new String[0]);
+        return goodWordsArray;
 
     }
 
