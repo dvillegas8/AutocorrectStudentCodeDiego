@@ -36,6 +36,8 @@ public class Autocorrect {
         String[] dictionary = words;
         String wordOne = "";
         ArrayList<String>[] arrayOfArrayLists = new ArrayList[2];
+        arrayOfArrayLists[0] = new ArrayList<String>();
+        arrayOfArrayLists[1] = new ArrayList<String>();
         ArrayList<String> goodWords = new ArrayList<String>();
         for(int i = 0; i < words.length; i++){
             wordOne = words[i];
@@ -54,27 +56,34 @@ public class Autocorrect {
             }
         }
         ArrayList<String> goodWordsThree = new ArrayList<String>();
-        int min = Integer.parseInt(arrayOfArrayLists[1].get(0));
+        int min = 0;
         int minIndex = 0;
         for(int i = 0; i < arrayOfArrayLists[1].size() - 1; i++){
+            min = Integer.parseInt(arrayOfArrayLists[1].get(i));
+            minIndex = i;
             for(int j = i + 1; j < arrayOfArrayLists[1].size(); j++){
-                if(min < Integer.parseInt(arrayOfArrayLists[1].get(j))){
+                // Find the lowest edit distance
+                if(min > Integer.parseInt(arrayOfArrayLists[1].get(j))){
                     min = Integer.parseInt(arrayOfArrayLists[1].get(j));
                     minIndex = j;
                 }
+                // If edit distance are the same
                 else if(min == Integer.parseInt(arrayOfArrayLists[1].get(j))){
                     // If word at j comes before word at min index
-                    if(arrayOfArrayLists[1].get(j).compareTo(arrayOfArrayLists[1].get(minIndex)) < 0){
+                    if(arrayOfArrayLists[0].get(j).compareTo(arrayOfArrayLists[0].get(minIndex)) < 0){
                         min = Integer.parseInt(arrayOfArrayLists[1].get(j));
                         minIndex = j;
                     }
 
                 }
             }
-            goodWordsThree.add(arrayOfArrayLists[1].get(minIndex));
+            goodWordsThree.add(arrayOfArrayLists[0].get(minIndex));
+            arrayOfArrayLists[0].remove(arrayOfArrayLists[0].get(minIndex));
+            arrayOfArrayLists[1].remove(arrayOfArrayLists[1].get(minIndex));
+            i--;
         }
-
-        String[] goodWordsArray = goodWords.toArray(new String[0]);
+        goodWordsThree.add(arrayOfArrayLists[0].get(0));
+        String[] goodWordsArray = goodWordsThree.toArray(new String[0]);
         return goodWordsArray;
 
     }
@@ -130,5 +139,16 @@ public class Autocorrect {
             }
         }
         return table[wordOne.length()][wordTwo.length()];
+    }
+    public void findCandidates(){
+        ArrayList<String> candidates = new ArrayList<String>();
+        // Turn dictionary into a trie
+
+        Trie trie = new Trie(new Node(false, new Node[255]));
+
+        for(int i = 0; i < words.length; i++){
+
+        }
+
     }
 }
