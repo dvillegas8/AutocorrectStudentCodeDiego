@@ -140,15 +140,27 @@ public class Autocorrect {
         }
         return table[wordOne.length()][wordTwo.length()];
     }
-    public void findCandidates(){
+    public ArrayList<String> findCandidates(String misspelledWord){
         ArrayList<String> candidates = new ArrayList<String>();
         // Turn dictionary into a trie
-
         Trie trie = new Trie(new Node(false, new Node[255]));
-
         for(int i = 0; i < words.length; i++){
-
+            trie.insert(words[i]);
         }
-
+        // Check if word is already in the dictionary
+        if(trie.lookup(misspelledWord)){
+            System.out.println("Word is in dictionary!");
+            return candidates;
+        }
+        // Max Distance between the length of the mispelled word and the candidate words
+        int maxDistance = 3;
+        // Reduce # of candidates by eliminating certain lengths
+        for(int i = 0; i < words.length; i++){
+            // Check if length of potential candidate word is in the range
+            if(words[i].length() >= misspelledWord.length() - 2 && words[i].length() <= misspelledWord.length() + 2){
+                candidates.add(words[i]);
+            }
+        }
+        return candidates;
     }
 }
