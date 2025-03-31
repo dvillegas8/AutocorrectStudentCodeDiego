@@ -1,8 +1,10 @@
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 /**
  * Autocorrect
@@ -33,7 +35,10 @@ public class Autocorrect {
      * to threshold, sorted by edit distnace, then sorted alphabetically.
      */
     public String[] runTest(String typed) {
-        String[] dictionary = words;
+        String[] dictionary = findCandidates(typed);
+        if(dictionary.length == 0){
+            return dictionary;
+        }
         String wordOne = "";
         ArrayList<String>[] arrayOfArrayLists = new ArrayList[2];
         arrayOfArrayLists[0] = new ArrayList<String>();
@@ -140,7 +145,7 @@ public class Autocorrect {
         }
         return table[wordOne.length()][wordTwo.length()];
     }
-    public ArrayList<String> findCandidates(String misspelledWord){
+    public String[] findCandidates(String misspelledWord){
         ArrayList<String> candidates = new ArrayList<String>();
         // Turn dictionary into a trie
         Trie trie = new Trie(new Node(false, new Node[255]));
@@ -149,11 +154,10 @@ public class Autocorrect {
         }
         // Check if word is already in the dictionary
         if(trie.lookup(misspelledWord)){
-            System.out.println("Word is in dictionary!");
-            return candidates;
+            return candidates.toArray(new String[0]);
         }
-        // Max Distance between the length of the mispelled word and the candidate words
-        int maxDistance = 3;
+        // Max Distance between the length of the misspelled word and the candidate words
+        int maxDistance = threshold;
         // Reduce # of candidates by eliminating certain lengths
         for(int i = 0; i < words.length; i++){
             // Check if length of potential candidate word is in the range
@@ -161,6 +165,52 @@ public class Autocorrect {
                 candidates.add(words[i]);
             }
         }
-        return candidates;
+        return candidates.toArray(new String[0]);
     }
+    private static String[] loadWords(BufferedReader br) {
+        String line;
+        try {
+            line = br.readLine();
+
+            // Update instance variables with test data
+            int n = Integer.parseInt(line);
+            String[] words = new String[n];
+
+            for (int i = 0; i < n; i++) {
+                line = br.readLine();
+                words[i] = line;
+            }
+            return words;
+        } catch (IOException e) {
+            System.out.println("Error opening test file");
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static void main(String[] args) throws FileNotFoundException {
+        BufferedReader reader = new BufferedReader(new FileReader("dictionaries/" + "large.txt"));
+        String[] dictionary = loadWords(reader);
+        Autocorrect autocorrect = new Autocorrect(dictionary, 3);
+        Scanner scanner = new Scanner(System.in);
+        String typedWord = "";
+
+        while(true){
+            System.out.println("Type in a word you want to correct: ");
+            System.out.println("type in Diego to stop");
+            typedWord = scanner.nextLine();
+            String[] candidates = autocorrect.runTest(typedWord);
+            if(candidates.length == 0){
+                System.out.println("Word is in dictionary!");
+            }
+            else if(typedWord.equals("Diego")){
+                break;
+            }
+            else{
+                for(int i = 0; i < 10; i++){
+                    System.out.println(candidates[i]);
+                }
+            }
+        }
+    }
+
 }

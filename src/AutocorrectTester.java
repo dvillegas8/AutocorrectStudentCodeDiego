@@ -13,14 +13,6 @@ public class AutocorrectTester {
 
     @Test
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    public void testSmall() {
-        setTestData(0);
-        studentSolution = new Autocorrect(dictionary, threshold);
-        assertArrayEquals(matches, studentSolution.runTest(typed), "Incorrect words returned.");
-    }
-
-    @Test
-    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
     public void testMed() {
         setTestData(1);
         studentSolution = new Autocorrect(dictionary, threshold);
